@@ -1,3 +1,4 @@
 Assets/Models/** filter=lfs diff=lfs merge=lfs -text
 Assets/Materials/AICS/** filter=lfs diff=lfs merge=lfs -text
 Assets/StreamingAssets/** filter=lfs diff=lfs merge=lfs -text
+Assets/Data/** filter=lfs diff=lfs merge=lfs -text
