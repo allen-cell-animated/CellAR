@@ -5,10 +5,12 @@ using UnityEngine;
 public class RenderTrajectory : MonoBehaviour 
 {
     public int currentFrame;
+    public int frameRate;
     public string trajectoryName;
     public GameObject[] geometryPrefabs;
 
     GameObjectList[] agentInstances;
+    float lastTime;
 
     TrajectoryFrame[] _trajectory;
     public TrajectoryFrame[] trajectory
@@ -35,8 +37,12 @@ public class RenderTrajectory : MonoBehaviour
 
     void Update ()
     {
-        currentFrame = currentFrame >= trajectory.Length - 1 ? 0 : currentFrame + 1;
-        RenderFrame(currentFrame);
+        if (Time.time - lastTime >= 1f / frameRate)
+        {
+            currentFrame = currentFrame >= trajectory.Length - 1 ? 0 : currentFrame + 1;
+            RenderFrame(currentFrame);
+            lastTime = Time.time;
+        }
     }
 
     void CreateAgents (int _frame)
@@ -59,7 +65,12 @@ public class RenderTrajectory : MonoBehaviour
                 continue;
             }
 
-            agentInstances[geometryIndex].gameObjects.Add(Instantiate(geometryPrefabs[geometryIndex], _agent.position, _agent.rotation, transform));
+            GameObject obj = Instantiate(geometryPrefabs[geometryIndex], transform);
+            obj.transform.localPosition = _agent.position;
+            obj.transform.localRotation = _agent.rotation;
+            obj.transform.localScale = Vector3.one;
+
+            agentInstances[geometryIndex].gameObjects.Add(obj);
         }
     }
 
@@ -74,12 +85,17 @@ public class RenderTrajectory : MonoBehaviour
 
             if (currentAgents[geometryIndex] >= agentInstances[geometryIndex].gameObjects.Count)
             {
-                agentInstances[geometryIndex].gameObjects.Add(Instantiate(geometryPrefabs[geometryIndex], _agent.position, _agent.rotation, transform));
+                GameObject obj = Instantiate(geometryPrefabs[geometryIndex], transform);
+                obj.transform.localPosition = _agent.position;
+                obj.transform.localRotation = _agent.rotation;
+                obj.transform.localScale = Vector3.one;
+
+                agentInstances[geometryIndex].gameObjects.Add(obj);
             }
             else
             {
-                agentInstances[geometryIndex].gameObjects[currentAgents[geometryIndex]].transform.position = _agent.position;
-                agentInstances[geometryIndex].gameObjects[currentAgents[geometryIndex]].transform.rotation = _agent.rotation;
+                agentInstances[geometryIndex].gameObjects[currentAgents[geometryIndex]].transform.localPosition = _agent.position;
+                agentInstances[geometryIndex].gameObjects[currentAgents[geometryIndex]].transform.localRotation = _agent.rotation;
                 agentInstances[geometryIndex].gameObjects[currentAgents[geometryIndex]].SetActive(true);
             }
             currentAgents[geometryIndex]++;
